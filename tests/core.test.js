@@ -113,10 +113,10 @@ test('Vercel first release builds the static output with the same security heade
  for(const {headers} of vercel.headers)for(const {key,value} of headers)assert(pages.includes(`  ${key}: ${value}`),`Mismatched ${key}`);
 });
 
-test('交通工具按航程揀：近海用船，遠程用飛機', async () => {
+test('交通工具一律用飛機（用戶定案）', async () => {
   const {travelMode} = await import('../public/world-v0.7.1.js');
-  assert.equal(travelMode('start', 'hong-kong'), 'ship');
-  assert.equal(travelMode('hong-kong', 'japan'), 'ship');
+  assert.equal(travelMode('start', 'hong-kong'), 'plane');
+  assert.equal(travelMode('hong-kong', 'japan'), 'plane');
   assert.equal(travelMode('start', 'japan'), 'plane');
   assert.equal(travelMode('japan', 'canada'), 'plane');
 });

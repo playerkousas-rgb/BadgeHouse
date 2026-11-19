@@ -62,13 +62,12 @@ export function insideScene(look,t,localBadges=[],interactive=false){const [roof
  return `<svg class="scene-graphic" viewBox="0 0 960 350" role="${interactive?'group':'img'}" aria-label="${t('收藏屋內景，見到門、窗同擺放收藏嘅傢俬','Collection room with a door, window, and badge furniture')}"><rect width="960" height="350" fill="${interior}"/><path d="M0 255h960v95H0Z" fill="#b9926c"/><path d="M0 273h960M0 300h960M0 326h960M121 255 70 350m201-95-26 95m178-95-7 95m168-95 12 95m157-95 39 95m132-95 59 95" fill="none" stroke="#8d6f53" opacity=".52" stroke-width="2"/><path d="M0 249h960v10H0z" fill="${trim}"/><path d="M88 256V98q52-38 104 0v158Z" fill="${roof}" stroke="${trim}" stroke-width="6"/><path d="M101 245V106q39-25 78 0v139Z" fill="none" stroke="${wall}" opacity=".4" stroke-width="2"/><circle cx="169" cy="187" r="4" fill="#e7c479"/><rect x="246" y="89" width="128" height="101" fill="#c4ded3" stroke="${trim}" stroke-width="8"/><path d="M250 173 284 134l31 28 25-23 30 35v12H250Z" fill="#8cad8c"/><path d="M310 90v99m-64-50h128" stroke="${trim}" stroke-width="5"/><path d="M238 190h144v9H238z" fill="${trim}"/><path d="M769 251h40l-8-29h-23z" fill="${roof}"/><path d="M789 225q-21-7-19-23 15 0 20 21 1-26 14-32 8 18-14 34" fill="#5f8562"/><path d="M229 293h149l25 29H207Z" fill="${roof}" opacity=".8"/>${interactive?`<g class="scene-door album-hotspot" data-action="open-album" role="button" tabindex="0" aria-label="${t('打開展示章簿','Open display album')}"><rect x="425" y="67" width="310" height="215" rx="8" fill="transparent"/>${furniture}</g>`:furniture}${displays}${scout(297,288,1.27)}</svg>`;
 }
 
-// 交通工具：按大圓距離揀。約 45° 以內（近海航程）用船；以上用飛機。
+// 交通工具：現時全部用飛機（見 travelMode）。
 // 2D 與 3D 共用同一規則，起點 start 係太平洋以西嘅示範出發點。
 const lonLatOf=id=>{if(id==='start')return [102,-11];const r=catalogue.find(x=>x.id===id);return r?[r.lon,r.lat]:[102,-11];};
 export function travelMode(from,to){
- const [lon1,lat1]=lonLatOf(from).map(d=>d*Math.PI/180),[lon2,lat2]=lonLatOf(to).map(d=>d*Math.PI/180);
- const cosine=Math.sin(lat1)*Math.sin(lat2)+Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon2-lon1);
- return Math.acos(Math.min(1,Math.max(-1,cosine)))<Math.PI/4?'ship':'plane';
+ // 行程一律乘飛機（用戶定案，v0.7.1）。保留 from／to 參數，方便日後按距離或地區分配。
+ return 'plane';
 }
 // 交通工具圖形以機頭向右（+x）繪製；move() 會按路線方向旋轉。
 export function vehicle2D(kind){
