@@ -1,7 +1,7 @@
-// © SCOUT SYSTEM · BadgeHouse v0.6.0. Original miniature models.
+// © SCOUT SYSTEM · BadgeHouse v0.7.3. Original miniature models.
 import {AmbientLight,BoxGeometry,Color,ConeGeometry,CylinderGeometry,DirectionalLight,Group,HemisphereLight,InstancedMesh,Matrix4,TorusGeometry,Line,LineDashedMaterial,BufferGeometry,Mesh,MeshBasicMaterial,MeshStandardMaterial,OrthographicCamera,PerspectiveCamera,PlaneGeometry,Quaternion,Raycaster,Scene,Shape,ExtrudeGeometry,SphereGeometry,SRGBColorSpace,TextureLoader,Vector2,Vector3,WebGLRenderer} from 'three';
-import {houseColours} from './world-v0.6.0.js';
-import {regions} from './catalog-v0.6.0.js';
+import {houseColours} from './world-v0.7.3.js';
+import {regions} from './catalog-v0.7.3.js';
 
 const radius=2.1, north=new Vector3(0,1,0);
 const spots={...Object.fromEntries(regions.map(r=>[r.id,[r.lon,r.lat]])),start:[102,-11]};
@@ -62,11 +62,35 @@ function room(root,look,images,redraw,local){const [roof,wall,trim,light]=houseC
  for(const [i,c] of ['#73523e','#b36346','#6b7e4f'].entries()){const ring=put(new TorusGeometry(.225,.08,8,20),mat(c),-.67+i*.67,.51,-.033,woggles);ring.rotation.x=Math.PI/2;}
  return [decor,scarves,woggles];}
 
+// 交通工具（原創幾何）：機頭朝 +Z，機背朝 +Y，沿大圓弧線飛行或貼海面航行。
+function modelPlane(){const g=new Group();const white='#f4f1e3',green='#2c5a3c';
+ const body=cyl(g,.05,.05,.9,0,0,0,white,16);body.rotation.x=Math.PI/2;ball(g,.05,0,0,.45,white,16);
+ box(g,.96,.02,.2,0,0,.05,white);box(g,.34,.015,.1,0,0,-.38,white);box(g,.02,.2,.13,0,.1,-.38,green);
+ for(const x of [-.25,.25]){const e=cyl(g,.035,.035,.2,x,-.04,.1,green,12);e.rotation.x=Math.PI/2;}
+ return g;}
+function modelShip(){const g=new Group();const white='#f4f1e3',green='#2c5a3c';
+ const shape=new Shape();shape.moveTo(-.2,-.34);shape.lineTo(.2,-.34);shape.lineTo(.2,.12);shape.lineTo(0,.36);shape.lineTo(-.2,.12);shape.closePath();
+ const hull=new ExtrudeGeometry(shape,{depth:.12,bevelEnabled:false});hull.rotateX(Math.PI/2);hull.translate(0,.12,0);put(hull,mat(green),0,0,0,g);
+ box(g,.38,.02,.6,0,.13,-.01,white);box(g,.26,.14,.26,0,.21,-.12,white);cyl(g,.05,.06,.18,0,.36,-.12,'#a65f40',12);
+ return g;}
+
 export function createStage(activate){
  const renderer=new WebGLRenderer({alpha:false,antialias:true,powerPreference:'low-power',preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,1.65));renderer.outputColorSpace=SRGBColorSpace;
- const canvas=renderer.domElement,tex=new TextureLoader().load('/maps/globe-v0.6.0.webp',()=>draw(),undefined,()=>{});tex.colorSpace=SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());canvas.setAttribute('aria-hidden','true');
- let scene,camera,state,root,actor,labels=[],targets=[],local,renderBox,observer,lost=false,motion=false,view,drag,projection,headLight,roomTarget,roomAngle,roomElevation,roomLength,dots;const ray=new Raycaster();
- function release(){observer?.disconnect();if(local)local.closed=true;root?.traverse(o=>{if(o.geometry)o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[]){if(m.map&&m.map!==tex)m.map.dispose();m.dispose();}});labels=[];targets=[];dots=null;root=null;}
+ const canvas=renderer.domElement,tex=new TextureLoader().load('/maps/globe-v0.7.3.webp',()=>draw(),undefined,()=>{});tex.colorSpace=SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());canvas.setAttribute('aria-hidden','true');
+ let scene,camera,state,root,actor,labels=[],targets=[],local,renderBox,observer,lost=false,motion=false,view,drag,projection,headLight,roomTarget,roomAngle,roomElevation,roomLength,dots,vehicle=null;const ray=new Raycaster();
+ function release(){observer?.disconnect();if(local)local.closed=true;vehicle=null;root?.traverse(o=>{if(o.geometry)o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[]){if(m.map&&m.map!==tex)m.map.dispose();m.dispose();}});labels=[];targets=[];dots=null;root=null;}
+ function zoomView(dir){if(!state||state.kind!=='globe'||!projection||!camera)return;projection=dir==='reset'?7.3:Math.max(4.6,Math.min(11,projection*(typeof dir==='number'?dir:dir==='in'?.75:1.33)));orbit(view);draw();}
+ function flyVehicle(itinerary,t){
+  const plane=itinerary.vehicle==='plane';
+  if(!vehicle){vehicle=plane?modelPlane():modelShip();vehicle.scale.setScalar(plane?.56:.5);root.add(vehicle);}
+  if(actor)actor.body.visible=false;
+  const a=locationVector(itinerary.from),b=locationVector(itinerary.to);
+  const p=arcPoint(a,b,t),ahead=arcPoint(a,b,Math.min(1,t+.01)),behind=arcPoint(a,b,Math.max(0,t-.01));
+  const y=p.clone().normalize(),forward=ahead.sub(behind);
+  const z=forward.sub(y.clone().multiplyScalar(forward.dot(y))).normalize(),x=new Vector3().crossVectors(y,z).normalize();
+  vehicle.position.copy(y).multiplyScalar(plane?radius+.16+Math.sin(Math.PI*t)*.2:radius+.02);
+  vehicle.quaternion.setFromRotationMatrix(new Matrix4().makeBasis(x,y,z));
+ }
  function light(){scene.add(new HemisphereLight('#fff6db','#69826b',2.05));const d=new DirectionalLight('#fff0d1',2.35);d.position.set(-4,7,6);scene.add(d);}
  function orbit(dir){view.copy(dir).normalize();camera.position.copy(view).multiplyScalar(projection);headLight?.position.copy(camera.position).add(new Vector3(-2,3,0));camera.lookAt(0,0,0);camera.updateMatrixWorld();}
  function setGlobeActor(n,phase=0,walking=false){actor.body.position.copy(n).multiplyScalar(radius+.045);actor.body.quaternion.setFromUnitVectors(north,n);pose(actor,phase,walking);}
@@ -78,8 +102,8 @@ export function createStage(activate){
   const center=state.from==='start'?toVector(110,20):locationVector(state.from);view=center.clone();camera=new PerspectiveCamera(40,1,.08,40);projection=7.3;orbit(view);
   put(new SphereGeometry(radius,72,48),mat('#fffef2',{map:tex,roughness:1}),0,0,0,root);
   const start=locationVector('start'),active=locationVector(state.selected);const quiet=state.regions.filter(r=>r.count===0&&r.id!==state.selected);
-  dots=new InstancedMesh(new SphereGeometry(.027,8,6),new MeshBasicMaterial({color:'#426d59'}),quiet.length);dots.userData.ids=quiet.map(r=>r.id);quiet.forEach((r,i)=>{const p=locationVector(r.id,radius+.021);dots.setMatrixAt(i,new Matrix4().makeTranslation(p.x,p.y,p.z));});root.add(dots);
-  for(const r of state.regions){const chosen=r.id===state.selected;if(!r.count&&!chosen)continue;const n=locationVector(r.id),p=n.clone().multiplyScalar(radius+.047);if(r.count)dash(start,n,'#e2e8b0',.54);ball(root,.052,p.x,p.y,p.z,chosen?'#f4c374':'#e5dfac',10);const el=document.createElement('button');el.className=`globe-pin ${chosen?'chosen':''}`;el.type='button';const flag=document.createElement('img');flag.src=`/flags-v1/${r.flag}.svg`;flag.alt='';el.append(flag,` ${r.label} · ${r.count}`);el.dataset.action='destination';el.dataset.value=r.id;renderBox.append(el);labels.push({el,n,v:n.clone().multiplyScalar(radius+.16)});}
+  dots=new InstancedMesh(new SphereGeometry(.058,12,8),new MeshBasicMaterial({color:'#f8f3d4'}),quiet.length);dots.userData.ids=quiet.map(r=>r.id);quiet.forEach((r,i)=>{const p=locationVector(r.id,radius+.021);dots.setMatrixAt(i,new Matrix4().makeTranslation(p.x,p.y,p.z));});root.add(dots);
+  for(const r of state.regions){const chosen=r.id===state.selected;if(!r.count&&!chosen)continue;const n=locationVector(r.id),p=n.clone().multiplyScalar(radius+.047);if(r.count)dash(start,n,'#e2e8b0',.54);ball(root,chosen?.1:.085,p.x,p.y,p.z,chosen?'#f4c374':'#e5dfac',14);const el=document.createElement('button');el.className=`globe-pin ${chosen?'chosen':''}`;el.type='button';const flag=document.createElement('img');flag.src=`/flags-v1/${r.flag}.svg`;flag.alt='';el.append(flag,` ${r.label} · ${r.count}`);el.dataset.action='destination';el.dataset.value=r.id;renderBox.append(el);labels.push({el,n,v:n.clone().multiplyScalar(radius+.16)});}
   dash(locationVector(state.from),active,'#f8c172',.92);actor=modelScout();actor.body.scale.setScalar(.36);root.add(actor.body);setGlobeActor(locationVector(state.from));
  }
  function lookAtMiniature(){camera.position.copy(roomTarget).add(new Vector3(Math.sin(roomAngle)*roomLength,roomElevation,Math.cos(roomAngle)*roomLength));camera.lookAt(roomTarget);camera.updateMatrixWorld();}
@@ -93,11 +117,13 @@ export function createStage(activate){
  }
  function update(container,next){if(lost)return false;release();renderBox=container;state=next;local={closed:false};motion=false;drag=null;container.replaceChildren(canvas);scene=new Scene();root=new Group();scene.add(root);if(state.kind==='globe')makeGlobe();else makeVillage();observer=new ResizeObserver(size);observer.observe(container);size();return true;}
  function step(itinerary,t){if(!root||!state||!renderBox?.isConnected)return;motion=t<1;if(state.kind==='globe'&&itinerary.type==='globe'){
-   const a=locationVector(itinerary.from),b=locationVector(itinerary.to),n=arcPoint(a,b,t);setGlobeActor(n,t,motion);orbit(arcPoint(itinerary.startView||view,b,Math.min(1,t*1.28)));
+   const a=locationVector(itinerary.from),b=locationVector(itinerary.to);if(itinerary.vehicle)flyVehicle(itinerary,t);else setGlobeActor(arcPoint(a,b,t),t,motion);orbit(arcPoint(itinerary.startView||view,b,Math.min(1,t*1.28)));
   }else if(state.kind==='street'&&itinerary.type==='street'){const z=t<.77?2.92:2.92-(t-.77)/.23*1.87,x=-6.2+(itinerary.index===0?2.78:9.62)*Math.min(1,t/.77);actor.body.position.set(x,.07,z);actor.body.rotation.y=t<.77?Math.PI/2:Math.PI;pose(actor,t,motion);}draw();}
- canvas.addEventListener('pointerdown',e=>{if(!root||motion||e.button>0)return;canvas.setPointerCapture(e.pointerId);drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};});
- canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId||!state||motion)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.moved&&Math.abs(dx)+Math.abs(dy)<4)return;drag.moved=true;drag.x=e.clientX;drag.y=e.clientY;if(state.kind==='globe'){const a=Math.asin(view.y)*180/Math.PI,l=Math.atan2(-view.z,view.x)*180/Math.PI;orbit(toVector(l+dx*.38,Math.max(-72,Math.min(72,a+dy*.32))));}else{roomAngle=Math.max(state.kind==='inside'?.14:-.64,Math.min(1.08,roomAngle-dx*.008));roomElevation=Math.max(5.2,Math.min(16,roomElevation+dy*.035));lookAtMiniature();}draw();});
- canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const prev=drag;drag=null;if(prev.moved||motion||Math.hypot(e.clientX-prev.x,e.clientY-prev.y)>10)return;const rect=canvas.getBoundingClientRect();ray.setFromCamera(new Vector2((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2),camera);if(state.kind==='globe'){const eye=camera.position.clone().normalize();const hit=dots&&ray.intersectObject(dots)[0];const id=hit&&dots.userData.ids[hit.instanceId];if(id&&locationVector(id).dot(eye)>.23)activate('destination',id);return;}const hit=ray.intersectObjects(targets.map(o=>o[0]),true)[0];if(hit)for(let obj=hit.object;obj;obj=obj.parent){const target=targets.find(row=>row[0]===obj);if(target){activate(target[1],target[2]);break;}}});
- canvas.addEventListener('pointercancel',()=>{drag=null;});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;renderBox?.classList.remove('live-3d');renderBox?.parentElement?.classList.remove('scene-3d-active');});canvas.addEventListener('webglcontextrestored',()=>{lost=false;});
- return {update,step,unmount:release,view:()=>view?.clone(),canvas};
+ const pointers=new Map(),pinchGap=()=>{const [a,b]=[...pointers.values()];return Math.hypot(a.x-b.x,a.y-b.y);};let pinch=0;
+ canvas.addEventListener('pointerdown',e=>{pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(!root||motion||e.button>0)return;try{canvas.setPointerCapture(e.pointerId);}catch{}if(pointers.size===2){drag=null;pinch=pinchGap();return;}drag={id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};});
+ canvas.addEventListener('pointermove',e=>{const p=pointers.get(e.pointerId);if(p){p.x=e.clientX;p.y=e.clientY;}if(pointers.size===2&&pinch>0&&state?.kind==='globe'&&!motion){const d=pinchGap();if(d>0)zoomView(pinch/d);pinch=d;return;}if(!drag||drag.id!==e.pointerId||!state||motion)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.moved&&Math.abs(dx)+Math.abs(dy)<4)return;drag.moved=true;drag.x=e.clientX;drag.y=e.clientY;if(state.kind==='globe'){const a=Math.asin(view.y)*180/Math.PI,l=Math.atan2(-view.z,view.x)*180/Math.PI;orbit(toVector(l+dx*.38,Math.max(-72,Math.min(72,a+dy*.32))));}else{roomAngle=Math.max(state.kind==='inside'?.14:-.64,Math.min(1.08,roomAngle-dx*.008));roomElevation=Math.max(5.2,Math.min(16,roomElevation+dy*.035));lookAtMiniature();}draw();});
+ canvas.addEventListener('pointerup',e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(!drag||drag.id!==e.pointerId)return;const prev=drag;drag=null;if(prev.moved||motion||Math.hypot(e.clientX-prev.x,e.clientY-prev.y)>10)return;const rect=canvas.getBoundingClientRect();ray.setFromCamera(new Vector2((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2),camera);if(state.kind==='globe'){const eye=camera.position.clone().normalize();const hit=dots&&ray.intersectObject(dots)[0];const id=hit&&dots.userData.ids[hit.instanceId];if(id&&locationVector(id).dot(eye)>.23)activate('destination',id);return;}const hit=ray.intersectObjects(targets.map(o=>o[0]),true)[0];if(hit)for(let obj=hit.object;obj;obj=obj.parent){const target=targets.find(row=>row[0]===obj);if(target){activate(target[1],target[2]);break;}}});
+ canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;drag=null;});
+ canvas.addEventListener('wheel',e=>{if(!state||state.kind!=='globe'||motion)return;const dy=e.deltaMode===1?e.deltaY*40:e.deltaY;if(!dy)return;const before=projection;zoomView(Math.min(1.25,Math.max(.8,Math.exp(dy*.0012))));if(projection!==before)e.preventDefault();},{passive:false});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;renderBox?.classList.remove('live-3d');renderBox?.parentElement?.classList.remove('scene-3d-active');});canvas.addEventListener('webglcontextrestored',()=>{lost=false;});
+ return {update,step,unmount:release,view:()=>view?.clone(),canvas,zoom:zoomView};
 }

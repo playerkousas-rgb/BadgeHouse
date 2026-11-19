@@ -1,7 +1,7 @@
-import {scoutRows} from './scout-regions-v0.6.0.js';
+import {scoutRows} from './scout-regions-v0.7.3.js';
 export const houses = [
  {id:'hong-kong', zh:'獅子山章屋',en:'Lion Rock Badge House',region:['香港','Hong Kong'],area:'asia',areaLabel:['亞洲','Asia'],initial:'HK',color:'#a97449', desc:['由香港營章到海外交流紀念，記錄每次出發同相遇。','From local camp patches to keepsakes from overseas adventures.'],badges:[['獅子山露營章','Lion Rock Camp','mountain','1998'],['海港交流章','Harbour Exchange','compass','2006'],['林間營火章','Woodland Campfire','fire','2018'],['山徑紀念章','Trail Memento','pine','2024']]},
- {id:'japan', zh:'富士山下嘅章簿',en:'The Fuji Field Journal',region:['日本','Japan'],area:'asia',areaLabel:['亞洲','Asia'],initial:'JP',color:'#a16d56',desc:['湖畔營地、懷舊布章，同埋喺山下交換返嚟嘅小故事。','Lakeside camps, vintage patches, and stories traded beneath the mountain.'],badges:[['富士山營章','Fuji Camp','mountain','2002'],['湖畔露營','Lakeside Camp','tent','2010'],['松林小徑','Pine Trail','pine','2015'],['晨曦紀念章','First Light','compass','2023']]},
+ {id:'japan', zh:'富士山下嘅收藏',en:'The Fuji Field Journal',region:['日本','Japan'],area:'asia',areaLabel:['亞洲','Asia'],initial:'JP',color:'#a16d56',desc:['湖畔營地、懷舊布章，同埋喺山下交換返嚟嘅小故事。','Lakeside camps, vintage patches, and stories traded beneath the mountain.'],badges:[['富士山營章','Fuji Camp','mountain','2002'],['湖畔露營','Lakeside Camp','tent','2010'],['松林小徑','Pine Trail','pine','2015'],['晨曦紀念章','First Light','compass','2023']]},
  {id:'canada', zh:'落基山收藏屋',en:'Rocky Mountain Cabin',region:['加拿大','Canada'],area:'americas',areaLabel:['北美洲','North America'],initial:'CA',color:'#55766e',desc:['由松林走到雪山，每一枚章都係一段行山同露營回憶。','From pine forests to snowy peaks, each patch holds a memory from the trail.'],badges:[['落基山行山章','Rockies Trek','mountain','1999'],['松林紀念章','Pine Forest','pine','2005'],['山間營火','Mountain Campfire','fire','2017'],['湖畔小屋','Lakeside Cabin','tent','2022']]}
 ];
 export function filterHouses(filter){return houses.filter(h=>filter==='all'||h.area===filter);}
@@ -23,7 +23,7 @@ export const regionFor=house=>regions.find(r=>r.id===house.regionId);
 export const housesIn=id=>houses.filter(h=>h.regionId===id);
 export const countHouses=id=>housesIn(id).length;
 export const collections=[
- {id:'badge',label:['章簿','Badge album'],sub:['揭頁睇布章同營章','Browse patches and camp badges'],glyph:'book'},
+ {id:'badge',label:['收藏','Badge collection'],sub:['揭頁睇布章同營章','Browse patches and camp badges'],glyph:'book'},
  {id:'scarf',label:['領巾牆','Neckerchief wall'],sub:['睇掛起嘅童軍領巾','View the hanging neckerchiefs'],glyph:'scarf'},
  {id:'woggle',label:['巾圈收藏盒','Woggle collection box'],sub:['打開盒睇唔同巾圈','Open the box to see the woggles'],glyph:'woggle'}
 ];
@@ -47,8 +47,8 @@ export function scoutSources(region,lang='zh'){
  const entry=wosmRegionPaths[region.area],flag=flagReferences[region.id];
  return {
   directory:entry ? `${official}/where-we-work/regions/${entry}/countries` : '',
-  emblem:region.id==='hong-kong' ? `https://www.scout.org.hk/${lang==='en'?'en':'tc'}/scouting/emblem.html` : region.emblem && `${official}${region.emblem}`,
+  emblem:region.id==='hong-kong' ? `https://www.scout.org.hk/${lang==='zh'?'tc':'en'}/scouting/emblem.html` : region.emblem && `${official}${region.emblem}`,
   flag:flag?.[0]||'',
-  flagLabel:flag?.[lang==='en'?2:1]||''
+  flagLabel:flag?[flag[1],flag[2]]:['','']
  };
 }
