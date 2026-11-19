@@ -1,4 +1,4 @@
-// © SCOUT SYSTEM · BadgeHouse v0.7.0 · Local guestbook and bookmarks.
+// © SCOUT SYSTEM · BadgeHouse v0.7.1 · Local guestbook and bookmarks.
 export const socialFields=['instagram','facebook','website'];
 export const maxVisits=60;
 export function socialURL(value){
