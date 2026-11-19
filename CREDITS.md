@@ -12,4 +12,5 @@
 
 ## v0.7.2 · 補充字型
 
-- Noto Sans TC（Google Fonts，SIL OFL 1.1），來源：npm `@fontsource-variable/noto-sans-tc` 5.3.1 的繁體中文分段變數字型；只取 UI 用到而舊 subset 未收錄嘅字，產生 `public/static/fonts/noto-sans-tc-ui-extra-*-v0.7.2.woff2`。OFL 授權見 `public/static/fonts/OFL-Noto-Sans-TC.txt`。
+- Noto Sans TC（Google Fonts，SIL OFL 1.1），來源：npm `@fontsource-variable/noto-sans-tc` 5.3.1 的繁體中文分段變數字型；只取 UI 用到而舊 subset 未收錄嘅字，產生 `public/static/fonts/noto-sans-tc-ui-extra-*-v0.7.3.woff2`。OFL 授權見 `public/static/fonts/OFL-Noto-Sans-TC.txt`。
+- Noto Sans JP、Noto Sans KR 及 Noto Sans Latin／Latin Ext（Google Fonts，SIL OFL 1.1），來源：npm `@fontsource-variable/noto-sans-jp`、`@fontsource-variable/noto-sans-kr`、`@fontsource-variable/noto-sans` 5.x。只取 ja、ko、Latin 文案用到嘅字，產生 `public/static/fonts/noto-sans-{ja,ko,lat}-sub-*-v0.7.3.woff2`（約 188 KB，按需載入）。授權文本見 [OFL-Noto-Sans-TC.txt](public/static/fonts/OFL-Noto-Sans-TC.txt)，同一 OFL。

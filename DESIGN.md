@@ -1,4 +1,4 @@
-# DESIGN · Scout Field · BadgeHouse v0.7.2
+# DESIGN · Scout Field · BadgeHouse v0.7.3
 
 依[真理倉 Scout Field](https://github.com/playerkousas-rgb/readme/blob/4c63ac3096bf87fcff760b45b34adab14b1b2576/templates/repo-starter/docs/design-styles_v1.0.md)做導航與工具介面。戶外主題適合地圖；動作集中喺畫面，不用宣傳式 hero 或生成相片。
 
@@ -35,3 +35,12 @@
 - 不再使用副標題、重複導覽掣或步行流程提示；球面不再疊加文字「3D」。
 - 字型：補充字按 unicode-range 分段（OFL），缺字不得以方框顯示。
 - 版號：`0.7.2`（檔名、APP_VERSION、頁尾、`package.json`、測試）。
+
+## v0.7.3 增量
+- 語言：八種語言（粵語繁中、English、日本語、한국어、Español、Français、Português、Bahasa Indonesia）。頂欄語言掣保留單一掣，按一次切到下一語言，掣面顯示下一語言簡稱，aria-label 寫明「切換至〔語言〕」。
+- 頂欄：661–960px 改兩行（品牌與掣第一行，導覽第二行）；窄螢幕日文隱藏新增掣文字，保留圖示。
+- 字型：Latin 重音、日文假名及漢字、韓文諺文以子集字型按 unicode-range 補齊，只在畫到相應字元時下載。
+- 地圖縮放：2D 滾輪與雙指以游標或兩指中點為中心；3D 地球同樣支援滾輪與雙指。2D 地圖 `touch-action: pan-y`，縮放時 `none`。
+- 名稱：「章簿」一律改為「收藏」。
+- 版號：`0.7.3`（檔名、APP_VERSION、頁尾、`package.json`、測試）。
+
