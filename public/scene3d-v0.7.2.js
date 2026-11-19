@@ -1,7 +1,7 @@
-// © SCOUT SYSTEM · BadgeHouse v0.7.1. Original miniature models.
+// © SCOUT SYSTEM · BadgeHouse v0.7.2. Original miniature models.
 import {AmbientLight,BoxGeometry,Color,ConeGeometry,CylinderGeometry,DirectionalLight,Group,HemisphereLight,InstancedMesh,Matrix4,TorusGeometry,Line,LineDashedMaterial,BufferGeometry,Mesh,MeshBasicMaterial,MeshStandardMaterial,OrthographicCamera,PerspectiveCamera,PlaneGeometry,Quaternion,Raycaster,Scene,Shape,ExtrudeGeometry,SphereGeometry,SRGBColorSpace,TextureLoader,Vector2,Vector3,WebGLRenderer} from 'three';
-import {houseColours} from './world-v0.7.1.js';
-import {regions} from './catalog-v0.7.1.js';
+import {houseColours} from './world-v0.7.2.js';
+import {regions} from './catalog-v0.7.2.js';
 
 const radius=2.1, north=new Vector3(0,1,0);
 const spots={...Object.fromEntries(regions.map(r=>[r.id,[r.lon,r.lat]])),start:[102,-11]};
@@ -76,9 +76,10 @@ function modelShip(){const g=new Group();const white='#f4f1e3',green='#2c5a3c';
 
 export function createStage(activate){
  const renderer=new WebGLRenderer({alpha:false,antialias:true,powerPreference:'low-power',preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,1.65));renderer.outputColorSpace=SRGBColorSpace;
- const canvas=renderer.domElement,tex=new TextureLoader().load('/maps/globe-v0.7.1.webp',()=>draw(),undefined,()=>{});tex.colorSpace=SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());canvas.setAttribute('aria-hidden','true');
+ const canvas=renderer.domElement,tex=new TextureLoader().load('/maps/globe-v0.7.2.webp',()=>draw(),undefined,()=>{});tex.colorSpace=SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());canvas.setAttribute('aria-hidden','true');
  let scene,camera,state,root,actor,labels=[],targets=[],local,renderBox,observer,lost=false,motion=false,view,drag,projection,headLight,roomTarget,roomAngle,roomElevation,roomLength,dots,vehicle=null;const ray=new Raycaster();
  function release(){observer?.disconnect();if(local)local.closed=true;vehicle=null;root?.traverse(o=>{if(o.geometry)o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[]){if(m.map&&m.map!==tex)m.map.dispose();m.dispose();}});labels=[];targets=[];dots=null;root=null;}
+ function zoomView(dir){if(!state||state.kind!=='globe'||!projection||!camera)return;projection=dir==='reset'?7.3:Math.max(4.6,Math.min(11,projection*(dir==='in'?.75:1.33)));orbit(view);draw();}
  function flyVehicle(itinerary,t){
   const plane=itinerary.vehicle==='plane';
   if(!vehicle){vehicle=plane?modelPlane():modelShip();vehicle.scale.setScalar(plane?.56:.5);root.add(vehicle);}
@@ -122,5 +123,5 @@ export function createStage(activate){
  canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId||!state||motion)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.moved&&Math.abs(dx)+Math.abs(dy)<4)return;drag.moved=true;drag.x=e.clientX;drag.y=e.clientY;if(state.kind==='globe'){const a=Math.asin(view.y)*180/Math.PI,l=Math.atan2(-view.z,view.x)*180/Math.PI;orbit(toVector(l+dx*.38,Math.max(-72,Math.min(72,a+dy*.32))));}else{roomAngle=Math.max(state.kind==='inside'?.14:-.64,Math.min(1.08,roomAngle-dx*.008));roomElevation=Math.max(5.2,Math.min(16,roomElevation+dy*.035));lookAtMiniature();}draw();});
  canvas.addEventListener('pointerup',e=>{if(!drag||drag.id!==e.pointerId)return;const prev=drag;drag=null;if(prev.moved||motion||Math.hypot(e.clientX-prev.x,e.clientY-prev.y)>10)return;const rect=canvas.getBoundingClientRect();ray.setFromCamera(new Vector2((e.clientX-rect.left)/rect.width*2-1,1-(e.clientY-rect.top)/rect.height*2),camera);if(state.kind==='globe'){const eye=camera.position.clone().normalize();const hit=dots&&ray.intersectObject(dots)[0];const id=hit&&dots.userData.ids[hit.instanceId];if(id&&locationVector(id).dot(eye)>.23)activate('destination',id);return;}const hit=ray.intersectObjects(targets.map(o=>o[0]),true)[0];if(hit)for(let obj=hit.object;obj;obj=obj.parent){const target=targets.find(row=>row[0]===obj);if(target){activate(target[1],target[2]);break;}}});
  canvas.addEventListener('pointercancel',()=>{drag=null;});canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;renderBox?.classList.remove('live-3d');renderBox?.parentElement?.classList.remove('scene-3d-active');});canvas.addEventListener('webglcontextrestored',()=>{lost=false;});
- return {update,step,unmount:release,view:()=>view?.clone(),canvas};
+ return {update,step,unmount:release,view:()=>view?.clone(),canvas,zoom:zoomView};
 }

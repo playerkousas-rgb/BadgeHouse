@@ -1,4 +1,4 @@
-import {scoutRows} from './scout-regions-v0.7.1.js';
+import {scoutRows} from './scout-regions-v0.7.2.js';
 export const houses = [
  {id:'hong-kong', zh:'獅子山章屋',en:'Lion Rock Badge House',region:['香港','Hong Kong'],area:'asia',areaLabel:['亞洲','Asia'],initial:'HK',color:'#a97449', desc:['由香港營章到海外交流紀念，記錄每次出發同相遇。','From local camp patches to keepsakes from overseas adventures.'],badges:[['獅子山露營章','Lion Rock Camp','mountain','1998'],['海港交流章','Harbour Exchange','compass','2006'],['林間營火章','Woodland Campfire','fire','2018'],['山徑紀念章','Trail Memento','pine','2024']]},
  {id:'japan', zh:'富士山下嘅章簿',en:'The Fuji Field Journal',region:['日本','Japan'],area:'asia',areaLabel:['亞洲','Asia'],initial:'JP',color:'#a16d56',desc:['湖畔營地、懷舊布章，同埋喺山下交換返嚟嘅小故事。','Lakeside camps, vintage patches, and stories traded beneath the mountain.'],badges:[['富士山營章','Fuji Camp','mountain','2002'],['湖畔露營','Lakeside Camp','tent','2010'],['松林小徑','Pine Trail','pine','2015'],['晨曦紀念章','First Light','compass','2023']]},

@@ -10,3 +10,6 @@
 - **組織標誌來源（v0.4.1）**：Scoutworld 快照的 `logoUrl` 是會徽參考，唔係會旗。只保留符合 WOSM 官方縮圖路徑嘅可點連結，唔下載、嵌入或向訪客預載。會旗另據[香港童軍總會政策通告 06/2022 附件二](https://www.scout.org.hk/uploads/tc/circulars/9926/pc-062022_c.pdf#page=4)、[日本童軍連盟公開規程第九章](https://www.scout.or.jp/about/regulations)及 [Scouts Canada 用品社圖片](https://www.scoutshop.ca/products/flag-hoist-sct-canada-50-x-36)，只作教育導覽；連結唔代表獲授權複製圖像或官方認可。
 - **v0.7.0 設計參考**：版面及 tokens 沿用真理倉 [Scout Field](https://github.com/playerkousas-rgb/readme/blob/4c63ac3096bf87fcff760b45b34adab14b1b2576/templates/repo-starter/docs/design-styles_v1.0.md)；資源評估方法參考 [docs/23](https://github.com/playerkousas-rgb/readme/blob/d6241875f38971b6b8d0e5c9a86114289db0dd56/docs/23-design-resources.md)（commit `d624187`）。未引入新第三方圖標、插畫或字體；候選見 [設計資源評估](docs/design-resources.md)。
 
+## v0.7.2 · 補充字型
+
+- Noto Sans TC（Google Fonts，SIL OFL 1.1），來源：npm `@fontsource-variable/noto-sans-tc` 5.3.1 的繁體中文分段變數字型；只取 UI 用到而舊 subset 未收錄嘅字，產生 `public/static/fonts/noto-sans-tc-ui-extra-*-v0.7.2.woff2`。OFL 授權見 `public/static/fonts/OFL-Noto-Sans-TC.txt`。

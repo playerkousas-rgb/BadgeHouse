@@ -1,7 +1,7 @@
-// © SCOUT SYSTEM · BadgeHouse v0.7.1. Original vector scenes.
-import {socialLinks} from './visit-v0.7.1.js';
-import {land,graticule,geoPoints} from './map-data-v0.7.1.js';
-import {regions as catalogue,countHouses,escapeHTML as esc} from './catalog-v0.7.1.js';
+// © SCOUT SYSTEM · BadgeHouse v0.7.2. Original vector scenes.
+import {socialLinks} from './visit-v0.7.2.js';
+import {land,graticule,geoPoints} from './map-data-v0.7.2.js';
+import {regions as catalogue,countHouses,escapeHTML as esc} from './catalog-v0.7.2.js';
 const outline='#334c39';
 export const paint={
  green:['#477257','#eee1b9','#a66e4f','#dce8d5'],red:['#a45745','#f5deb9','#705443','#efdfd2'],blue:['#537484','#e9e4cf','#795c48','#dce8eb'],brown:['#8d6947','#ead1a1','#724c39','#eee2cd'],
@@ -29,15 +29,20 @@ export function mapStop(id){if(id==='start')return geoPoints.start;const region=
 export function trail(a,b){ const length=Math.hypot(b[0]-a[0],b[1]-a[1]); return {a,b,c:[(a[0]+b[0])/2,(a[1]+b[1])/2+Math.min(115,20+length*.18)]}; }
 export function trailPoint({a,b,c},t){const u=1-t;return [u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]];}
 function drawTrail(a,b){const seg=trail(a,b);return `M${a.join(' ')}Q${seg.c.join(' ')} ${b.join(' ')}`;}
-export function mapScene(regions,t,selected,from){
- const origin=mapStop('start'),target=selected&&mapStop(selected),arrival=mapStop(from);
- return `<svg class="map-graphic" viewBox="0 0 960 460" role="group" aria-label="${t('可互動世界地圖','Interactive world map')}"><defs><pattern id="ocean-tiles" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M12 11v2m-1-1h2" stroke="#8eb1a8" opacity=".48"/></pattern></defs><path fill="#d8eae4" d="M0 0h960v460H0z"/><path fill="url(#ocean-tiles)" d="M0 0h960v460H0z"/><path d="${graticule}" fill="none" stroke="#99b9af" stroke-width=".65" opacity=".59"/><path d="${land}" fill="#b0c496" stroke="#789572" stroke-width="1.1" stroke-linejoin="round"/>
+// 縮放：視窗（viewBox）按 z 縮窄，中心 cx／cy 限制喺世界範圍內。
+export function clampMapView(v){const z=Math.max(1,Math.min(4,v.z)),W=960/z,H=460/z;return {z,cx:Math.max(W/2,Math.min(960-W/2,v.cx)),cy:Math.max(H/2,Math.min(460-H/2,v.cy))};}
+export function mapViewBox(v){const z=v.z,W=960/z,H=460/z,x=Math.max(0,Math.min(960-W,v.cx-W/2)),y=Math.max(0,Math.min(460-H,v.cy-H/2));return `${x.toFixed(1)} ${y.toFixed(1)} ${W.toFixed(1)} ${H.toFixed(1)}`;}
+// 圓點按縮放比例縮細：放大得愈多，點位愈細但仍清楚。
+export function pinScale(z){return Math.pow(z,-.42);}
+export function mapScene(regions,t,selected,from,view={z:1,cx:480,cy:230}){
+ const origin=mapStop('start'),target=selected&&mapStop(selected),arrival=mapStop(from),k=pinScale(view.z);
+ return `<svg class="map-graphic${view.z>1?' zoomed':''}" viewBox="${mapViewBox(view)}" role="group" aria-label="${t('可互動世界地圖','Interactive world map')}"><defs><pattern id="ocean-tiles" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M12 11v2m-1-1h2" stroke="#8eb1a8" opacity=".48"/></pattern></defs><path fill="#d8eae4" d="M0 0h960v460H0z"/><path fill="url(#ocean-tiles)" d="M0 0h960v460H0z"/><path d="${graticule}" fill="none" stroke="#99b9af" stroke-width=".65" opacity=".59"/><path d="${land}" fill="#b0c496" stroke="#789572" stroke-width="1.1" stroke-linejoin="round"/>
  <g fill="#526e63" class="ocean-type"><text x="119" y="244">PACIFIC OCEAN</text><text x="348" y="242">ATLANTIC OCEAN</text><text x="580" y="319">INDIAN OCEAN</text></g>
  <g stroke="#4e6c5b" fill="none" class="compass-rose" transform="translate(77 359)"><circle r="26" stroke-dasharray="1 4"/><path d="M0-24v48M-24 0h48"/><path d="M0-19 6 6 0 3-6 6Z" fill="#b16b4f"/><path d="M0 19 6-6 0-3-6-6Z" fill="#759586"/><text x="0" y="-34" stroke="none" fill="#456354" text-anchor="middle">N</text></g>
  <g fill="none" stroke="#758d6d" stroke-dasharray="2 8" stroke-linecap="round" stroke-width="2">${regions.filter(r=>countHouses(r.id)).map(r=>`<path d="${drawTrail(origin,mapStop(r.id))}"/>`).join('')}</g>
  ${target?`<path class="journey-route" d="${drawTrail(arrival,target)}" fill="none" stroke="#a65f40" stroke-width="2.7" stroke-dasharray="4 6" stroke-linecap="round"/>`:''}
  <g transform="translate(${origin.join(' ')})"><circle r="8" fill="#f1e4b7" stroke="#596f50" stroke-width="2"/><path d="m-3 2 3-5 3 5z" fill="#546e50"/></g>
- ${regions.map(r=>{const [x,y]=r.xy,count=countHouses(r.id),focus=selected===r.id||count>0,end=x>800,name=esc(t(...r.label));return `<g class="map-pin ${selected===r.id?'chosen':''} ${count?'has-house':'no-house'}" data-action="destination" data-value="${r.id}" ${focus?'role="button" tabindex="0"':''} aria-label="${name} · ${count}" transform="translate(${x} ${y})"><circle class="pin-hit" r="17" fill="transparent"/>${focus?`<circle class="pin-halo" r="14" fill="#fff8dd" stroke="#687f5e" stroke-width="2"/><circle r="9.5" fill="${count?'#a4553d':'#597958'}"/><text class="pin-count" text-anchor="middle" y="4.5" fill="#fff">${count}</text><text text-anchor="${end?'end':'start'}" x="${end?-21:21}" y="6" class="place-text">${name} · ${count}</text>`:`<circle class="pin-halo" r="8" fill="#3f6b52" stroke="#f7f4df" stroke-width="2.5"/><text text-anchor="${end?'end':'start'}" x="${end?-14:14}" y="5" class="place-text place-hint">${name}</text>`}</g>`}).join('')}
+ ${regions.map(r=>{const [x,y]=r.xy,count=countHouses(r.id),focus=selected===r.id||count>0,end=x>800,name=esc(t(...r.label));return `<g class="map-pin ${selected===r.id?'chosen':''} ${count?'has-house':'no-house'}" data-action="destination" data-value="${r.id}" ${focus?'role="button" tabindex="0"':''} aria-label="${name} · ${count}" transform="translate(${x} ${y})"><g class="pin-body" transform="scale(${k})"><circle class="pin-hit" r="18" fill="transparent"/>${focus?`<circle class="pin-halo" r="15" fill="#fff8dd" stroke="#687f5e" stroke-width="2"/><circle r="11" fill="${count?'#a4553d':'#597958'}"/><text class="pin-count" text-anchor="middle" y="4.5" fill="#fff">${count}</text><text text-anchor="${end?'end':'start'}" x="${end?-21:21}" y="6" class="place-text">${name} · ${count}</text>`:`<circle class="pin-halo" r="10" fill="#3f6b52" stroke="#f7f4df" stroke-width="2.5"/><text text-anchor="${end?'end':'start'}" x="${end?-17:17}" y="5" class="place-text place-hint">${name}</text>`}</g></g>`}).join('')}
  ${scout(...arrival,.95,'map-scout')}
  </svg>`;
 }
@@ -66,7 +71,7 @@ export function insideScene(look,t,localBadges=[],interactive=false){const [roof
 // 2D 與 3D 共用同一規則，起點 start 係太平洋以西嘅示範出發點。
 const lonLatOf=id=>{if(id==='start')return [102,-11];const r=catalogue.find(x=>x.id===id);return r?[r.lon,r.lat]:[102,-11];};
 export function travelMode(from,to){
- // 行程一律乘飛機（用戶定案，v0.7.1）。保留 from／to 參數，方便日後按距離或地區分配。
+ // 行程一律乘飛機（用戶定案，v0.7.2）。保留 from／to 參數，方便日後按距離或地區分配。
  return 'plane';
 }
 // 交通工具圖形以機頭向右（+x）繪製；move() 會按路線方向旋轉。

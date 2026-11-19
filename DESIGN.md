@@ -1,4 +1,4 @@
-# DESIGN · Scout Field · BadgeHouse v0.7.1
+# DESIGN · Scout Field · BadgeHouse v0.7.2
 
 依[真理倉 Scout Field](https://github.com/playerkousas-rgb/readme/blob/4c63ac3096bf87fcff760b45b34adab14b1b2576/templates/repo-starter/docs/design-styles_v1.0.md)做導航與工具介面。戶外主題適合地圖；動作集中喺畫面，不用宣傳式 hero 或生成相片。
 
@@ -27,3 +27,11 @@
 - 指示：現時頁面用 `::after` 底線；選定地區用 `inset 3px` 左側單線，兩者都有文字或 `aria-pressed`／`aria-current`，唔靠顏色單獨傳遞。
 - 唔做：陰影堆疊、漸層、玻璃模糊、emoji、橙色用於地圖以外位置、入場表演動畫。
 - 版號：`0.7.1`（檔名、APP_VERSION、頁尾、`package.json`、測試）。
+
+## v0.7.2 增量
+
+- 地圖工具列：縮放掣（−／重設／+）與 2D／3D 掣同一行，44px 觸控目標；放大只限 4 倍。
+- 面板：目的地卡置頂，主動作「乘飛機去〔地區〕」；次要篩選用 `<details>` 收摺（摘要列 44px）。
+- 不再使用副標題、重複導覽掣或步行流程提示；球面不再疊加文字「3D」。
+- 字型：補充字按 unicode-range 分段（OFL），缺字不得以方框顯示。
+- 版號：`0.7.2`（檔名、APP_VERSION、頁尾、`package.json`、測試）。
