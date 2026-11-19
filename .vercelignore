@@ -1,0 +1,15 @@
+.git/
+.github/
+.cache/
+.vercel/
+.wrangler/
+node_modules/
+dist/
+docs/
+skills/
+tests/
+.env
+.env.*
+*.bak
+*.log
+public/index.html

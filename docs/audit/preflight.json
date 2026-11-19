@@ -1,0 +1,53 @@
+{
+  "tool": "preflight",
+  "version": "v1.0",
+  "repo": "/home/user/BadgeHouse",
+  "ok": true,
+  "mode": "target-repo",
+  "counts": {
+    "pass": 8,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "id": "scripts",
+      "ok": true,
+      "detail": "4 支真理 script 齊（guard.mjs, final_check_v1.0.mjs, repo_health_v1.0.mjs, check_skills_v1.0.mjs）"
+    },
+    {
+      "id": "placeholders",
+      "ok": true,
+      "detail": "無未填 placeholder"
+    },
+    {
+      "id": "utf8",
+      "ok": true,
+      "detail": "60 個文字檔 UTF-8 clean"
+    },
+    {
+      "id": "syntax",
+      "ok": true,
+      "detail": "8 個 .mjs parse 到"
+    },
+    {
+      "id": "guard",
+      "ok": true,
+      "detail": "G10／A1／S 全綠 — ✅ GUARD PASS — 20 項檢查全綠（1 個警告）"
+    },
+    {
+      "id": "final_check",
+      "ok": true,
+      "detail": "六角度 ok: true"
+    },
+    {
+      "id": "repo_health",
+      "ok": true,
+      "detail": "無 FAIL（WARN 入 backlog，唔阻塞）"
+    },
+    {
+      "id": "check_skills",
+      "ok": true,
+      "detail": "5 份 SKILL.md frontmatter 合格"
+    }
+  ]
+}
