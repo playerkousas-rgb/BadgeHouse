@@ -1,7 +1,7 @@
-// © SCOUT SYSTEM · BadgeHouse v0.6.0. Original vector scenes.
-import {socialLinks} from './visit-v0.6.0.js';
-import {land,graticule,geoPoints} from './map-data-v0.6.0.js';
-import {regions as catalogue,countHouses,escapeHTML as esc} from './catalog-v0.6.0.js';
+// © SCOUT SYSTEM · BadgeHouse v0.7.0. Original vector scenes.
+import {socialLinks} from './visit-v0.7.0.js';
+import {land,graticule,geoPoints} from './map-data-v0.7.0.js';
+import {regions as catalogue,countHouses,escapeHTML as esc} from './catalog-v0.7.0.js';
 const outline='#334c39';
 export const paint={
  green:['#477257','#eee1b9','#a66e4f','#dce8d5'],red:['#a45745','#f5deb9','#705443','#efdfd2'],blue:['#537484','#e9e4cf','#795c48','#dce8eb'],brown:['#8d6947','#ead1a1','#724c39','#eee2cd'],

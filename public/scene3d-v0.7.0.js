@@ -1,7 +1,7 @@
-// © SCOUT SYSTEM · BadgeHouse v0.6.0. Original miniature models.
+// © SCOUT SYSTEM · BadgeHouse v0.7.0. Original miniature models.
 import {AmbientLight,BoxGeometry,Color,ConeGeometry,CylinderGeometry,DirectionalLight,Group,HemisphereLight,InstancedMesh,Matrix4,TorusGeometry,Line,LineDashedMaterial,BufferGeometry,Mesh,MeshBasicMaterial,MeshStandardMaterial,OrthographicCamera,PerspectiveCamera,PlaneGeometry,Quaternion,Raycaster,Scene,Shape,ExtrudeGeometry,SphereGeometry,SRGBColorSpace,TextureLoader,Vector2,Vector3,WebGLRenderer} from 'three';
-import {houseColours} from './world-v0.6.0.js';
-import {regions} from './catalog-v0.6.0.js';
+import {houseColours} from './world-v0.7.0.js';
+import {regions} from './catalog-v0.7.0.js';
 
 const radius=2.1, north=new Vector3(0,1,0);
 const spots={...Object.fromEntries(regions.map(r=>[r.id,[r.lon,r.lat]])),start:[102,-11]};
@@ -64,7 +64,7 @@ function room(root,look,images,redraw,local){const [roof,wall,trim,light]=houseC
 
 export function createStage(activate){
  const renderer=new WebGLRenderer({alpha:false,antialias:true,powerPreference:'low-power',preserveDrawingBuffer:false});renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,1.65));renderer.outputColorSpace=SRGBColorSpace;
- const canvas=renderer.domElement,tex=new TextureLoader().load('/maps/globe-v0.6.0.webp',()=>draw(),undefined,()=>{});tex.colorSpace=SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());canvas.setAttribute('aria-hidden','true');
+ const canvas=renderer.domElement,tex=new TextureLoader().load('/maps/globe-v0.7.0.webp',()=>draw(),undefined,()=>{});tex.colorSpace=SRGBColorSpace;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());canvas.setAttribute('aria-hidden','true');
  let scene,camera,state,root,actor,labels=[],targets=[],local,renderBox,observer,lost=false,motion=false,view,drag,projection,headLight,roomTarget,roomAngle,roomElevation,roomLength,dots;const ray=new Raycaster();
  function release(){observer?.disconnect();if(local)local.closed=true;root?.traverse(o=>{if(o.geometry)o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[]){if(m.map&&m.map!==tex)m.map.dispose();m.dispose();}});labels=[];targets=[];dots=null;root=null;}
  function light(){scene.add(new HemisphereLight('#fff6db','#69826b',2.05));const d=new DirectionalLight('#fff0d1',2.35);d.position.set(-4,7,6);scene.add(d);}

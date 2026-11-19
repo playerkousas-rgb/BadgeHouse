@@ -2,7 +2,7 @@
 
 跟住小童軍由世界地圖去到收藏家嘅屋，揭章簿、睇領巾同巾圈，認識各地童軍藏品。
 
-## 第一版 · v0.6.0（本機優先）
+## 第一版 · v0.7.0（本機優先）
 
 ```sh
 npm ci
@@ -26,7 +26,7 @@ node scripts/preflight_v1.0.mjs . --json
 部署後用 HTTPS 開正式網址，試轉地球、入一間示範屋同開相機。部署只公開應用程式；屋主資料、收藏、書籤同訪客簿仍各自留喺瀏覽器。由原型預覽網址轉新網域時，舊瀏覽器資料唔會自動帶過去；三類藏品可先匯出備份，再喺正式網址匯入。屋設計同簡介未包含在備份內。
 
 - [設計規範](DESIGN.md) · [設計與實測](docs/design-review.md)
-- [GitHub 相近專案及取捨](docs/research.md) · [素材來源](CREDITS.md)
+- [GitHub 相近專案及取捨](docs/research.md) · [素材來源](CREDITS.md) · [設計資源評估](docs/design-resources.md)
 - [直連、儲存及後端決策](docs/adr/0001-local-collection-and-published-houses.md)
 - [開發順序](AGENTS.md) · [共用技能目錄](skills/CATALOG.md) · [版本紀錄](CHANGELOG.md)
 
